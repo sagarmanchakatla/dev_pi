@@ -10,6 +10,6 @@ app = FastAPI(
 async def health():
     return {"status": "healthy", "version": "0.1.0"}
 
-@app.get("/api")
-async def api():
-	return {"status": "api"}
+@app.get("/ping")
+async def ping():
+    return {"ping": "pong"}
