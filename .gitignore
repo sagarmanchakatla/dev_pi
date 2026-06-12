@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+venv/
+*.egg-info/
+
+# Environment files (never commit secrets)
+.env
+.env.*
+!.env.example
+
+# Certificates and keys (never commit)
+*.pem
+*.key
+*.crt
+certs/
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backups
+backups/
