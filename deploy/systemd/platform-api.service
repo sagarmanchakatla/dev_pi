@@ -1,0 +1,19 @@
+[Unit]
+Description=Platform API
+After=network.target
+
+[Service]
+Type=simple
+User=platform
+Group=platform
+WorkingDirectory=/opt/platform-api
+ExecStart=/opt/platform-api/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
+Restart=on-failure
+RestartSec=5s
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=platform-api
+EnvironmentFile=-/opt/platform-api/.env
+
+[Install]
+WantedBy=multi-user.target
