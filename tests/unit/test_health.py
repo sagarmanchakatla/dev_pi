@@ -3,16 +3,17 @@ from app.main import app
 
 client = TestClient(app)
 
-def test_health_check():
-    response = client.get("/health")
+def test_liveness():
+    response = client.get("/health/live")
     assert response.status_code == 200
-    assert response.json()["status"] == "healthy"
+    data = response.json()
+    assert data["status"] == "alive"
+    assert "version" in data
+    assert "environment" in data
 
-def test_root():
-    response = client.get("/")
+def test_readiness():
+    response = client.get("/health/ready")
     assert response.status_code == 200
-
-def test_ping():
-    response = client.get("/ping")
-    assert response.status_code == 200
-    assert response.json()["ping"] == "pong"
+    data = response.json()
+    assert data["status"] == "ready"
+    assert "checks" in data
