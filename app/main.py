@@ -1,8 +1,15 @@
 from fastapi import FastAPI
 from app.core.config import settings
+from app.core.logging import setup_logging, get_logger
+from app.core.middleware import RequestLoggingMiddleware
 from app.api.v1 import health
 
+logger = get_logger(__name__)
+
 def create_app() -> FastAPI:
+    # Setup logging first
+    setup_logging()
+
     app = FastAPI(
         title=settings.APP_NAME,
         version=settings.APP_VERSION,
@@ -11,20 +18,30 @@ def create_app() -> FastAPI:
         redoc_url="/redoc" if settings.DEBUG else None,
     )
 
+    # Add middleware
+    app.add_middleware(RequestLoggingMiddleware)
+
+    # Routers
     app.include_router(health.router, tags=["health"])
 
     @app.on_event("startup")
     async def on_startup():
-        print(f"Starting {settings.APP_NAME} v{settings.APP_VERSION}")
-        print(f"Environment: {settings.ENVIRONMENT}")
-        print(f"Debug: {settings.DEBUG}")
-        print(f"Database: {'configured' if settings.DATABASE_URL else 'not configured'}")
-        print(f"Redis: {'configured' if settings.REDIS_URL else 'not configured'}")
-        # SECRET_KEY is never logged
+        logger.info(
+            "application_starting",
+            app=settings.APP_NAME,
+            version=settings.APP_VERSION,
+            environment=settings.ENVIRONMENT,
+            debug=settings.DEBUG,
+            database="configured" if settings.DATABASE_URL else "not configured",
+            redis="configured" if settings.REDIS_URL else "not configured",
+        )
 
     @app.on_event("shutdown")
     async def on_shutdown():
-        print(f"Shutting down {settings.APP_NAME}")
+        logger.info(
+            "application_stopping",
+            app=settings.APP_NAME,
+        )
 
     return app
 
