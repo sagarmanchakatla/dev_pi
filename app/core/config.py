@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings
+from pydantic import SecretStr
 from functools import lru_cache
 from typing import Optional
 
@@ -14,13 +15,13 @@ class Settings(BaseSettings):
     PORT: int = 8000
 
     # Database
-    DATABASE_URL: Optional[str] = None
+    DATABASE_URL: Optional[SecretStr] = None
 
     # Redis
-    REDIS_URL: Optional[str] = None
+    REDIS_URL: Optional[SecretStr] = None
 
     # Security
-    SECRET_KEY: str = "change-this-in-production"
+    SECRET_KEY: SecretStr = SecretStr("change-this-in-production")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     class Config:
