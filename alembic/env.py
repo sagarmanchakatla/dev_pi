@@ -9,6 +9,19 @@ from alembic import context
 # access to the values within the .ini file in use.
 config = context.config
 
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
+from app.core.config import settings
+
+config.set_main_option(
+    "sqlalchemy.url",
+    settings.DATABASE_URL.get_secret_value().replace(
+        "postgresql://", "postgresql+psycopg2://", 1
+    ) if settings.DATABASE_URL else "postgresql://localhost/platform_api"
+)
+
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
