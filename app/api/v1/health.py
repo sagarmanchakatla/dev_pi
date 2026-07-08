@@ -1,6 +1,8 @@
 from fastapi import APIRouter
 from app.core.config import settings
+from app.core.logging import get_logger
 
+logger = get_logger(__name__)
 router = APIRouter()
 
 @router.get("/health/live")
@@ -19,18 +21,36 @@ async def readiness():
     checks = {}
     ready = True
 
-    # Database check (placeholder until Phase 5)
+    # Database check
     if settings.DATABASE_URL:
-        checks["database"] = "connected"
+        try:
+            from app.db.session import engine
+            if engine:
+                async with engine.connect() as conn:
+                    await conn.execute(__import__('sqlalchemy').text("SELECT 1"))
+                checks["database"] = "connected"
+            else:
+                checks["database"] = "not configured"
+        except Exception as e:
+            checks["database"] = f"error: {str(e)}"
+            ready = False
     else:
         checks["database"] = "not configured"
 
-    # Redis check (placeholder until Phase 6)
+    # Redis check
     if settings.REDIS_URL:
-        checks["redis"] = "connected"
+        try:
+            from app.core.redis import get_redis
+            r = await get_redis()
+            await r.ping()
+            checks["redis"] = "connected"
+        except Exception as e:
+            checks["redis"] = f"error: {str(e)}"
+            ready = False
     else:
         checks["redis"] = "not configured"
 
+    status_code = 200 if ready else 503
     return {
         "status": "ready" if ready else "not ready",
         "checks": checks
