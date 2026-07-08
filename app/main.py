@@ -4,6 +4,7 @@ from app.core.logging import setup_logging, get_logger
 from app.core.middleware import RequestLoggingMiddleware
 from app.api.v1 import health
 from app.api.v1 import users
+from app.api.v1 import auth
 
 logger = get_logger(__name__)
 
@@ -21,6 +22,7 @@ def create_app() -> FastAPI:
     app.add_middleware(RequestLoggingMiddleware)
     app.include_router(health.router, tags=["health"])
     app.include_router(users.router, prefix="/api/v1", tags=["users"])
+    app.include_router(auth.router, prefix="/api/v1", tags=["auth"])
 
     @app.on_event("startup")
     async def on_startup():
