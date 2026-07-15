@@ -35,6 +35,43 @@ class TokenResponse(BaseModel):
     token_type: str
     expires_in: int
 
+class RegisterRequest(BaseModel):
+    email: str
+    password: str
+    name: str
+
+@router.post("/auth/register", status_code=201)
+async def register(data: RegisterRequest):
+    """
+    Register a new user.
+    Returns immediately — background jobs handle email/notifications.
+    """
+    from app.core.jobs import enqueue
+
+    # In production: save to database here
+    user_id = 999  # mock
+
+    # Enqueue background jobs — do not wait for them
+    await enqueue("send_welcome_email", {
+        "user_id": user_id,
+        "email": data.email,
+        "name": data.name,
+    })
+
+    await enqueue("notify_slack", {
+        "channel": "sales",
+        "message": f"New user registered: {data.email}",
+    })
+
+    logger.info("user_registered", email=data.email, user_id=user_id)
+
+    return {
+        "message": "Registration successful",
+        "user_id": user_id,
+        "note": "Welcome email will arrive shortly"
+    }
+
+
 @router.post("/auth/login", response_model=TokenResponse)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     """Authenticate user and return JWT access token."""
