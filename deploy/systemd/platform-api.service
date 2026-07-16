@@ -35,6 +35,12 @@ ReadWritePaths=/opt/platform-api
 
 # Resource limits
 LimitNOFILE=65536
+LimitNPROC=512
+TasksMax=256
+MemoryHigh=400M
+MemoryMax=512M
+CPUQuota=80%
+OOMScoreAdjust=-100
 
 # Logging
 StandardOutput=journal
