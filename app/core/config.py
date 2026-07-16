@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     APP_VERSION: str = "0.1.1"
     DEBUG: bool = False
     ENVIRONMENT: str = "production"
+    LOG_LEVEL: str = "info"
 
     # Server
     HOST: str = "0.0.0.0"
