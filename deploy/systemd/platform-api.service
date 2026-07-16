@@ -1,19 +1,45 @@
 [Unit]
 Description=Platform API
-After=network.target
+Documentation=https://github.com/sagarmanchakatla/dev_pi
+After=network.target postgresql.service redis-server.service pgbouncer.service
+Wants=postgresql.service redis-server.service pgbouncer.service
 
 [Service]
 Type=simple
 User=platform
 Group=platform
 WorkingDirectory=/opt/platform-api
-ExecStart=/opt/platform-api/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+ExecStart=/opt/platform-api/venv/bin/uvicorn app.main:app \
+    --host 0.0.0.0 \
+    --port 8000 \
+    --workers 1 \
+    --log-level warning
+
+ExecReload=/bin/kill -HUP $MAINPID
+
 Restart=on-failure
 RestartSec=5s
+StartLimitIntervalSec=60s
+StartLimitBurst=3
+
+# Environment
+EnvironmentFile=/etc/platform-api/environment
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/platform-api
+
+# Resource limits
+LimitNOFILE=65536
+
+# Logging
 StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=platform-api
-EnvironmentFile=-/opt/platform-api/.env
 
 [Install]
 WantedBy=multi-user.target
