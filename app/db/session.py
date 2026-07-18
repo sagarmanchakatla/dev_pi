@@ -17,12 +17,19 @@ def get_engine():
     if db_url.startswith("postgresql://"):
         db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
 
+    # Remove sslmode parameter if present (asyncpg handles SSL differently)
+    if "sslmode" in db_url:
+        import re
+        db_url = re.sub(r'[?&]sslmode=[^&]*', '', db_url)
+
     return create_async_engine(
         db_url,
         pool_size=5,
         max_overflow=10,
         pool_pre_ping=True,   # verify connection before using
         echo=settings.DEBUG,  # log SQL in debug mode only
+	connect_args={"ssl": False},  # disable SSL for local connections
+
     )
 
 engine = get_engine()

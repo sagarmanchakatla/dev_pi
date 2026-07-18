@@ -24,6 +24,12 @@ def create_app() -> FastAPI:
     app.include_router(users.router, prefix="/api/v1", tags=["users"])
     app.include_router(auth.router, prefix="/api/v1", tags=["auth"])
 
+    # Setup Prometheus metrics
+    from app.core.metrics import setup_metrics
+    setup_metrics(app)
+    for route in app.routes:
+    	print(route.path, getattr(route, "methods", None))
+
     @app.on_event("startup")
     async def on_startup():
         logger.info(
