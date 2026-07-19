@@ -24,3 +24,12 @@
 
 ## Contacts
 - On-call: check PagerDuty
+
+## Monitoring
+
+Grafana dashboard: http://raspberrypi.local:3000
+Prometheus: http://raspberrypi.local:9090
+Default credentials: admin / changeme (change in production)
+
+Key dashboards:
+  Platform API Overview - request rate, latency, memory

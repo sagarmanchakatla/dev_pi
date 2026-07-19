@@ -5,6 +5,7 @@ __pycache__/
 .Python
 venv/
 *.egg-info/
+*.deb
 
 # Environment files (never commit secrets)
 .env
